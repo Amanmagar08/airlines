@@ -1,3 +1,12 @@
+body {
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    align-items: center; /* Centers vertically */
+    height: 100vh; /* Makes sure it takes the full height of the screen */
+    margin: 0;
+    background-color: #f8f9fa; /* Optional: Light background for better visibility */
+}
+
 .container {
     width: 60%;
     margin: auto;
@@ -20,7 +29,7 @@
     color: #007bff;
 }
 
-.list, .table {
+.list {
     background: #ffffff;
     padding: 15px;
     border-radius: 8px;
@@ -73,3 +82,31 @@
 .back-btn:hover {
     background: #0056b3;
 }
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    display: flex;
+    justify-content: center;
+    background: #ffffff;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+}
+
+table {
+    width: 90%;
+    max-width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    table-layout: fixed;
+}
+
+th, td {
+    word-wrap: break-word;
+    white-space: nowrap;
+    padding: 10px;
+    text-align: center;
+    vertical-align: middle;
+}
+
