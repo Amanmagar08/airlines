@@ -1,42 +1,40 @@
 {% extends "flights/layout.html" %}
 
 {% block body %}
-    <h1>Flight {{ flight.id }}</h1>
+    <div class="container">
+        <div class="flight-details">
+            <h2>Flight {{ flight.id }}</h2>
+            <p><strong>Origin:</strong> {{ flight.origin }}</p>
+            <p><strong>Destination:</strong> {{ flight.destination }}</p>
+            <p><strong>Duration:</strong> {{ flight.duration }} minutes</p>
+        </div>
 
-    <ul>
-        <li>Origin: {{ flight.origin }}</li>
-        <li>Destination: {{ flight.destination }}</li>
-        <li>Duration: {{ flight.duration }}</li>
-    </ul>
-
-    <h2>Passengers</h2>
-    <ul>
-        {% for passenger in passengers %}
-            <li>
-                {{ passenger }}
-                <!-- Add a form to remove the passenger -->
-                <form action="{% url 'remove' flight.id %}" method="POST" style="display: inline;">
-                    {% csrf_token %}
-                    <input type="hidden" name="passenger" value="{{ passenger.id }}">
-                    <button type="submit" style="background: none; border: none; color: red; cursor: pointer;">Remove</button>
-                </form>
-            </li>
-        {% empty %}
-            <li>No passengers on this flight.</li>
-        {% endfor %}
-    </ul>
-
-    <h2>Add Passenger</h2>
-    <form action="{% url 'book' flight.id %}" method="POST">
-        {% csrf_token %}
-        <select name="passenger">
-            {% for passenger in non_passengers %}
-                <option value="{{ passenger.id }}">{{ passenger }}</option>
+        <div class="list">
+            <h3>Passengers</h3>
+            {% for passenger in passengers %}
+                <div class="passenger-item">
+                    <span>{{ passenger }}</span>
+                    <form action="{% url 'remove' flight.id %}" method="POST" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="passenger" value="{{ passenger.id }}">
+                        <button type="submit">Remove</button>
+                    </form>
+                </div>
+            {% empty %}
+                <p>No passengers on this flight.</p>
             {% endfor %}
-        </select>
-        <input type="submit">
-    </form>
+        </div>
 
-    <br>
-    <a href="{% url 'indexx' %}">Back to Flight List</a>
+        <form action="{% url 'book' flight.id %}" method="POST">
+            {% csrf_token %}
+            <select name="passenger">
+                {% for passenger in non_passengers %}
+                    <option value="{{ passenger.id }}">{{ passenger }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="add-passenger-btn">Add Passenger</button>
+        </form>
+
+        <a href="{% url 'indexx' %}" class="back-btn">Back to Flight List</a>
+    </div>
 {% endblock %}
