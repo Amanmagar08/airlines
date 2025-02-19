@@ -1,12 +1,3 @@
-body {
-    display: flex;
-    justify-content: center; /* Centers horizontally */
-    align-items: center; /* Centers vertically */
-    height: 100vh; /* Makes sure it takes the full height of the screen */
-    margin: 0;
-    background-color: #f8f9fa; /* Optional: Light background for better visibility */
-}
-
 .container {
     width: 60%;
     margin: auto;
@@ -35,8 +26,15 @@ body {
     border-radius: 8px;
     margin-bottom: 20px;
     border: 1px solid #ddd;
+    max-height: 300px;
+    overflow: hidden;
 }
 
+.passenger-items-container {
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
 .passenger-item {
     display: flex;
     justify-content: space-between;
@@ -93,6 +91,17 @@ body {
     margin-bottom: 20px;
     border: 1px solid #ddd;
 }
+
+
+.scrollable-list {
+    background-color: blue;
+    width: 300px;
+    height: 100px; /* Set height */
+    overflow: auto; /* Adds scrollbars only when necessary */
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
 
 table {
     width: 90%;

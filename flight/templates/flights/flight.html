@@ -16,40 +16,41 @@
 <!--List of Passengers-->
         <div class="list">
             <h3>Passengers</h3>
-            {% for passenger in passengers %}
-                <div class="passenger-item">
-                    <span>{{ passenger }}</span>
-                   <form action="{% url 'remove' flight.id %}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to remove this passenger?');">
-                    {% csrf_token %}
-                    <input type="hidden" name="passenger" value="{{ passenger.id }}">
-                    <button type="submit">Remove</button>
-                    </form>
+            <div class="passenger-items-container">
+                {% for passenger in passengers %}
+                    <div class="passenger-item">
+                        <span>{{ passenger }}</span>
+                       <form action="{% url 'remove' flight.id %}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to remove this passenger?');">
+                        {% csrf_token %}
+                        <input type="hidden" name="passenger" value="{{ passenger.id }}">
+                        <button type="submit">Remove</button>
+                        </form>
 
-                </div>
-            {% empty %}
-                <p>No passengers on this flight.</p>
-            {% endfor %}
-
+                    </div>
+                {% empty %}
+                    <p>No passengers on this flight.</p>
+                {% endfor %}
+            </div>
         </div>
 
 
 <!--Check in For the Passengers-->
         <div class="list">
             <h3>Passenger Check-in</h3>
-            <ul>
-                {% for passenger in passengers %}
-                    <li class = "passenger-item" id="passenger-{{ passenger.id }}">
-                        {{ passenger.first }} {{ passenger.last }}
-                        <span id="status-{{ passenger.id }}" style="color: #6ab863">
-                            {% if passenger.checked_in %}
-                                ✅ Checked In
-                            {% else %}
-                                <button onclick="checkInPassenger({{ passenger.id }})" class="btn btn-success" style="background-color: #1e6e17">Check In</button>
-                            {% endif %}
-                        </span>
-                    </li>
-                {% endfor %}
-            </ul>
+                <div class="passenger-items-container">
+                        {% for passenger in passengers %}
+                            <li class = "passenger-item" id="passenger-{{ passenger.id }}">
+                                {{ passenger.first }} {{ passenger.last }}
+                                <span id="status-{{ passenger.id }}" style="color: #6ab863">
+                                    {% if passenger.checked_in %}
+                                        ✅ Checked In
+                                    {% else %}
+                                        <button onclick="checkInPassenger({{ passenger.id }})" class="btn btn-success" style="background-color: #1e6e17">Check In</button>
+                                    {% endif %}
+                                </span>
+                            </li>
+                        {% endfor %}
+                </div>
         </div>
 
 <!--jQuery JavaScript library -->
