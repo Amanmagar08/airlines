@@ -56,12 +56,11 @@
     background: #c82333;
 }
 
-.add-passenger-btn, .back-btn, .create-passenger-btn, .btn, .status{
+.add-passenger-btn, .back-btn, .create-passenger-btn, .btn, .status {
     display: block;
     width: 100%;
     padding: 10px;
     text-align: center;
-    background: #28a745;
     color: white;
     border: none;
     border-radius: 5px;
@@ -69,18 +68,22 @@
     margin-top: 10px;
 }
 
-.add-passenger-btn:hover, .back-btn:hover, .create-passenger-btn:hover, .btn:hover, .status:hover,  {
-    background: #218838;
+.add-passenger-btn, .create-passenger-btn, .btn, .status {
+    background: #28a745;
 }
 
 .back-btn {
     background: #007bff;
 }
 
+
 .back-btn:hover {
     background: #0056b3;
 }
 
+.add-passenger-btn:hover, .create-passenger-btn:hover, .btn:hover, .status:hover {
+    background: #278501;
+}
 .table-container {
     width: 100%;
     overflow-x: auto;
