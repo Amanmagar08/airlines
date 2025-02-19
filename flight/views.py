@@ -3,9 +3,9 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from .forms import PassengerForm
 from .models import Flight, Passenger, FlightPassenger
-
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from datetime import datetime
 
 
 # Create your views here.
@@ -87,3 +87,12 @@ def update_flight_status(request, flight_id):
     flight.save()
 
     return redirect("flight", flight_id=flight.id)
+
+def start(request):
+
+    current_time = datetime.now().strftime("%H:%M:%S")
+
+    return render(request, 'flights/start_page.html', {
+        'image_path': 'images/Aeroplane.jpg',
+        'current_time': current_time
+    })

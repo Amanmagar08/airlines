@@ -2,11 +2,14 @@
 {% load static%}
 
 {% block body %}
-  <h1>Create New Passenger</h1>
+    <div class="container" style="margin-top: 20px">
 
-  <form method="post">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit">Create Passenger</button>
-  </form>
+      <h1>Create New Passenger</h1>
+
+      <form method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit">Create Passenger</button>
+      </form>
+    </div>
 {% endblock %}
