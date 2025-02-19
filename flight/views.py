@@ -1,8 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseRedirect
-from django.contrib import messages
 from django.urls import reverse
-
+from .forms import PassengerForm
 from .models import Flight, Passenger, FlightPassenger
 
 from django.http import JsonResponse
@@ -59,3 +58,18 @@ def check_in(request, passenger_id, flight_id):
         except FlightPassenger.DoesNotExist:
             return JsonResponse({"success": False, "error": "Passenger not found on this flight."})
     return JsonResponse({"success": False, "error": "Invalid request method."})
+
+def create_passenger(request):
+    if request.method == "POST":
+        form = PassengerForm(request.POST)
+        if form.is_valid():
+            form.save()  # Save the new passenger to the database
+            return redirect('success')  # Redirect to a success page or flight detail page
+    else:
+        form = PassengerForm()
+    return render(request, 'flights/create_passenger.html', {'form': form})
+
+
+def success(request):
+    return render(request, 'flights/success.html')
+

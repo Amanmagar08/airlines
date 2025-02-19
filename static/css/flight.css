@@ -56,7 +56,7 @@
     background: #c82333;
 }
 
-.add-passenger-btn, .back-btn {
+.add-passenger-btn, .back-btn, .create-passenger-btn {
     display: block;
     width: 100%;
     padding: 10px;
