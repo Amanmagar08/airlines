@@ -73,3 +73,17 @@ def create_passenger(request):
 def success(request):
     return render(request, 'flights/success.html')
 
+def update_flight_status(request, flight_id):
+    flight = get_object_or_404(Flight, id=flight_id)
+
+    # Cycle through statuses
+    if flight.status == "Null":
+        flight.status = "ready"
+    elif flight.status == "ready":
+        flight.status = "boarding"
+    elif flight.status == "boarding":
+        flight.status = "landed"
+        flight.completed = True  # Mark flight as completed
+    flight.save()
+
+    return redirect("flight", flight_id=flight.id)

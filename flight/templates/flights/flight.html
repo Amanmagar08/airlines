@@ -6,7 +6,7 @@
 
 <!--Flight Details-->
         <div class="flight-details">
-            <h2 style="text-decoration: underline">Flight {{ flight.id }}:</h2>
+            <h2>Flight {{ flight.id }}:</h2>
             <p><strong>Origin:</strong> {{ flight.origin }}</p>
             <p><strong>Destination:</strong> {{ flight.destination }}</p>
             <p><strong>Duration:</strong> {{ flight.duration }} minutes</p>
@@ -19,11 +19,13 @@
                 {% for passenger in passengers %}
                     <div class="passenger-item">
                         <span>{{ passenger }}</span>
-                       <form action="{% url 'remove' flight.id %}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to remove this passenger?');">
-                        {% csrf_token %}
-                        <input type="hidden" name="passenger" value="{{ passenger.id }}">
-                        <button type="submit">Remove</button>
-                        </form>
+                        {% if flight.status == "Null" %}
+                           <form action="{% url 'remove' flight.id %}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to remove this passenger?');">
+                            {% csrf_token %}
+                            <input type="hidden" name="passenger" value="{{ passenger.id }}">
+                            <button type="submit">Remove</button>
+                            </form>
+                        {% endif %}
                     </div>
                 {% empty %}
                     <p>No passengers on this flight.</p>
@@ -34,20 +36,26 @@
 <!--Check in For the Passengers-->
         <div class="list">
             <h3>Passenger Check-in</h3>
-                <div class="passenger-items-container">
-                    {% for passenger in passengers %}
-                        <li class="passenger-item" id="passenger-{{ passenger.id }}">
-                            {{ passenger.first }} {{ passenger.last }}
-                            <span id="status-{{ passenger.id }}" style="color: #6ab863">
-                                {% if passenger_status|get_item:passenger.id %}
-                                    ✅ Checked In
-                                {% else %}
-                                    <button onclick="checkInPassenger({{ passenger.id }}, {{ flight.id }})" class="btn btn-success" style="background-color: #1e6e17">Check In</button>
-                                {% endif %}
-                            </span>
-                        </li>
-                    {% endfor %}
-                </div>
+            <div class="passenger-items-container">
+                {% for passenger in passengers %}
+                <li class="passenger-item" id="passenger-{{ passenger.id }}">
+                    {{ passenger.first }} {{ passenger.last }}
+                    <span id="status-{{ passenger.id }}" style="color: #6ab863">
+                        {% if passenger_status|get_item:passenger.id %}
+                            {% if flight.status == "Null" %}
+                            ✅ Checked In
+                            {% else %}
+                            ✅ Present In Flight
+                        {% endif %}
+                        {% else %}
+                        {% if flight.status == "Null" %}
+                            <button onclick="checkInPassenger({{ passenger.id }}, {{ flight.id }})" class="btn btn-success" style="background-color: #1e6e17">Check In</button>
+                        {% endif %}
+                        {% endif %}
+                    </span>
+                </li>
+                {% endfor %}
+            </div>
         </div>
 
 <!--jQuery JavaScript library -->
@@ -76,17 +84,45 @@
         </script>
 
 <!--Add Passenger to the Flight-->
-        {% if non_passengers %}
-            <form action="{% url 'book' flight.id %}" method="POST">
-                {% csrf_token %}
-                <select name="passenger">
-                    {% for passenger in non_passengers %}
-                        <option value="{{ passenger.id }}">{{ passenger }}</option>
-                    {% endfor %}
-                </select>
-                <button type="submit" class="add-passenger-btn">Add Passenger</button>
-            </form>
+        {% if flight.status == "Null" %}
+            {% if non_passengers %}
+                <form action="{% url 'book' flight.id %}" method="POST">
+                    {% csrf_token %}
+                    <select name="passenger">
+                        {% for passenger in non_passengers %}
+                            <option value="{{ passenger.id }}">{{ passenger }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="add-passenger-btn">Add Passenger</button>
+                </form>
+            {% endif %}
         {% endif %}
+
+    {% if flight.status != "landed" %}
+        <div class="flight-details" >
+            <h1>Flight Status:</h1>
+            <p>Flight from {{ flight.origin }} to {{ flight.destination }}</p>
+            <p>Status: <strong>{{ flight.get_status_display }}</strong></p>
+
+            <form method="post" action="{% url 'update_flight_status' flight.id %}">
+                {% csrf_token %}
+                {% if flight.status == "Null" %}
+                    <button type="submit" class="status">Ready to Board</button>
+                {% elif flight.status == "ready" %}
+                    <button type="submit" class="status">Start Boarding</button>
+                {% elif flight.status == "boarding" %}
+                    <button type="submit" class="status">Mark as Landed</button>
+                {% else %}
+                    <button disabled class="status" style="background-color: #798269">Flight Completed</button>
+                {% endif %}
+            </form>
+        </div>
+    {% endif %}
+
+
+    {% if flight.status == "landed" %}
+        <button class="btn">Flight Completed</button>
+    {% endif %}
 
 
 <!--Return back to Flight list(index.html)-->

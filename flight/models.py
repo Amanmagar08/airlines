@@ -12,9 +12,21 @@ class Flight(models.Model):
     origin = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="departures")
     destination = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="arrivals")
     duration = models.IntegerField()
+    completed = models.BooleanField(default=False)  # Marks flight as completed
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ("Null", "Not Started"),
+            ("ready", "Ready to Board"),
+            ("boarding", "Boarding"),
+            ("landed", "Landed")
+        ],
+        default="null"
+    )
 
     def __str__(self):
-        return f"{self.id}: {self.origin.city} to {self.destination.city}"
+        return f"{self.id}: {self.origin.city} to {self.destination.city} ({self.get_status_display()})"
+
 
 class Passenger(models.Model):
     first = models.CharField(max_length=64)
