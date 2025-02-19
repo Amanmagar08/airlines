@@ -98,7 +98,7 @@
             {% endif %}
         {% endif %}
 
-    {% if flight.status != "landed" %}
+    {% if flight.status != "Landed" %}
         <div class="flight-details" >
             <h1>Flight Status:</h1>
             <p>Flight from {{ flight.origin }} to {{ flight.destination }}</p>
@@ -108,9 +108,9 @@
                 {% csrf_token %}
                 {% if flight.status == "Null" %}
                     <button type="submit" class="status">Ready to Board</button>
-                {% elif flight.status == "ready" %}
+                {% elif flight.status == "Ready" %}
                     <button type="submit" class="status">Start Boarding</button>
-                {% elif flight.status == "boarding" %}
+                {% elif flight.status == "Boarding" %}
                     <button type="submit" class="status">Mark as Landed</button>
                 {% else %}
                     <button disabled class="status" style="background-color: #798269">Flight Completed</button>
@@ -120,7 +120,7 @@
     {% endif %}
 
 
-    {% if flight.status == "landed" %}
+    {% if flight.status == "Landed" %}
         <button class="btn">Flight Completed</button>
     {% endif %}
 

@@ -78,11 +78,11 @@ def update_flight_status(request, flight_id):
 
     # Cycle through statuses
     if flight.status == "Null":
-        flight.status = "ready"
-    elif flight.status == "ready":
-        flight.status = "boarding"
-    elif flight.status == "boarding":
-        flight.status = "landed"
+        flight.status = "Ready"
+    elif flight.status == "Ready":
+        flight.status = "Boarding"
+    elif flight.status == "Boarding":
+        flight.status = "Landed"
         flight.completed = True  # Mark flight as completed
     flight.save()
 

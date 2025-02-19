@@ -17,9 +17,9 @@ class Flight(models.Model):
         max_length=20,
         choices=[
             ("Null", "Not Started"),
-            ("ready", "Ready to Board"),
-            ("boarding", "Boarding"),
-            ("landed", "Landed")
+            ("Ready", "Ready to Board"),
+            ("Boarding", "Boarding"),
+            ("Landed", "Landed")
         ],
         default="null"
     )
