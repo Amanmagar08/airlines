@@ -2,14 +2,18 @@
 
 {% block body %}
     <div class="container">
+
+
+<!--Flight Details-->
         <div class="flight-details">
-            <h2>Flight {{ flight.id }}</h2>
+            <h2 style="text-decoration: underline">Flight {{ flight.id }}:</h2>
             <p><strong>Origin:</strong> {{ flight.origin }}</p>
             <p><strong>Destination:</strong> {{ flight.destination }}</p>
             <p><strong>Duration:</strong> {{ flight.duration }} minutes</p>
         </div>
 
 
+<!--List of Passengers-->
         <div class="list">
             <h3>Passengers</h3>
             {% for passenger in passengers %}
@@ -28,61 +32,69 @@
 
         </div>
 
-<div class="list">
-    <h3>Passenger Check-in</h3>
-    <ul>
-        {% for passenger in passengers %}
-            <li class = "passenger-item" id="passenger-{{ passenger.id }}">
-                {{ passenger.first }} {{ passenger.last }}
-                <span id="status-{{ passenger.id }}" style="color: green">
-                    {% if passenger.checked_in %}
-                        ✅ Checked In
-                    {% else %}
-                        <button onclick="checkInPassenger({{ passenger.id }})" class="btn btn-success" style="background-color: green">Check In</button>
-                    {% endif %}
-                </span>
-            </li>
-        {% endfor %}
-    </ul>
-</div>
 
-<!-- Include jQuery or any other JavaScript library -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    function checkInPassenger(passengerId) {
-        // Send an AJAX request to the server
-        $.ajax({
-            url: "{% url 'check_in' 0 %}".replace("0", passengerId),
-            method: "POST",
-            data: {
-                csrfmiddlewaretoken: "{{ csrf_token }}",
-            },
-            success: function(response) {
-                if (response.success) {
-                    // Update the UI dynamically
-                    $("#status-" + passengerId).html("✅ Checked In");
-                } else {
-                    alert("Failed to check in passenger.");
-                }
-            },
-            error: function() {
-                alert("An error occurred while checking in.");
-            }
-        });
-    }
-</script>
-
-        <form action="{% url 'book' flight.id %}" method="POST">
-            {% csrf_token %}
-            <select name="passenger">
-                {% for passenger in non_passengers %}
-                    <option value="{{ passenger.id }}">{{ passenger }}</option>
+<!--Check in For the Passengers-->
+        <div class="list">
+            <h3>Passenger Check-in</h3>
+            <ul>
+                {% for passenger in passengers %}
+                    <li class = "passenger-item" id="passenger-{{ passenger.id }}">
+                        {{ passenger.first }} {{ passenger.last }}
+                        <span id="status-{{ passenger.id }}" style="color: #6ab863">
+                            {% if passenger.checked_in %}
+                                ✅ Checked In
+                            {% else %}
+                                <button onclick="checkInPassenger({{ passenger.id }})" class="btn btn-success" style="background-color: #1e6e17">Check In</button>
+                            {% endif %}
+                        </span>
+                    </li>
                 {% endfor %}
+            </ul>
+        </div>
 
-            </select>
-            <button type="submit" class="add-passenger-btn">Add Passenger</button>
-        </form>
+<!--jQuery JavaScript library -->
+<!--For Passenger Check in-->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            function checkInPassenger(passengerId) {
+// Send an AJAX request to the server
+                $.ajax({
+                    url: "{% url 'check_in' 0 %}".replace("0", passengerId),
+                    method: "POST",
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                    },
+                    success: function(response) {
+                        if (response.success) {
+// Update the UI dynamically
+                            $("#status-" + passengerId).html("✅ Checked In");
+                        } else {
+                            alert("Failed to check in passenger.");
+                        }
+                    },
+                    error: function() {
+                        alert("An error occurred while checking in.");
+                    }
+                });
+            }
+        </script>
 
-        <a href="{% url 'index' %}" class="back-btn">Back to Flight List</a>
+<!--Add Passenger to the Flight-->
+        {% if non_passengers %}
+            <form action="{% url 'book' flight.id %}" method="POST">
+                {% csrf_token %}
+                <select name="passenger">
+                    {% for passenger in non_passengers %}
+                        <option value="{{ passenger.id }}">{{ passenger }}</option>
+                    {% endfor %}
+
+                </select>
+                <button type="submit" class="add-passenger-btn">Add Passenger</button>
+            </form>
+        {% endif %}
+
+
+<!--Return back to Flight list(index.html)-->
+        <a href="{% url 'index' %}" class="back-btn" style="text-decoration: none">Back to Flight List</a>
     </div>
 {% endblock %}
