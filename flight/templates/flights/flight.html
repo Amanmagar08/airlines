@@ -1,8 +1,8 @@
 {% extends "flights/layout.html" %}
+{% load custom_filters %}
 
 {% block body %}
     <div class="container">
-
 
 <!--Flight Details-->
         <div class="flight-details">
@@ -11,7 +11,6 @@
             <p><strong>Destination:</strong> {{ flight.destination }}</p>
             <p><strong>Duration:</strong> {{ flight.duration }} minutes</p>
         </div>
-
 
 <!--List of Passengers-->
         <div class="list">
@@ -25,7 +24,6 @@
                         <input type="hidden" name="passenger" value="{{ passenger.id }}">
                         <button type="submit">Remove</button>
                         </form>
-
                     </div>
                 {% empty %}
                     <p>No passengers on this flight.</p>
@@ -33,23 +31,22 @@
             </div>
         </div>
 
-
 <!--Check in For the Passengers-->
         <div class="list">
             <h3>Passenger Check-in</h3>
                 <div class="passenger-items-container">
-                        {% for passenger in passengers %}
-                            <li class = "passenger-item" id="passenger-{{ passenger.id }}">
-                                {{ passenger.first }} {{ passenger.last }}
-                                <span id="status-{{ passenger.id }}" style="color: #6ab863">
-                                    {% if passenger.checked_in %}
-                                        ✅ Checked In
-                                    {% else %}
-                                        <button onclick="checkInPassenger({{ passenger.id }})" class="btn btn-success" style="background-color: #1e6e17">Check In</button>
-                                    {% endif %}
-                                </span>
-                            </li>
-                        {% endfor %}
+                    {% for passenger in passengers %}
+                        <li class="passenger-item" id="passenger-{{ passenger.id }}">
+                            {{ passenger.first }} {{ passenger.last }}
+                            <span id="status-{{ passenger.id }}" style="color: #6ab863">
+                                {% if passenger_status|get_item:passenger.id %}
+                                    ✅ Checked In
+                                {% else %}
+                                    <button onclick="checkInPassenger({{ passenger.id }}, {{ flight.id }})" class="btn btn-success" style="background-color: #1e6e17">Check In</button>
+                                {% endif %}
+                            </span>
+                        </li>
+                    {% endfor %}
                 </div>
         </div>
 
@@ -57,17 +54,15 @@
 <!--For Passenger Check in-->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script>
-            function checkInPassenger(passengerId) {
-// Send an AJAX request to the server
+            function checkInPassenger(passengerId, flightId) {
                 $.ajax({
-                    url: "{% url 'check_in' 0 %}".replace("0", passengerId),
+                    url: "{% url 'check_in' 0 0 %}".replace("0", flightId).replace("0", passengerId),
                     method: "POST",
                     data: {
                         csrfmiddlewaretoken: "{{ csrf_token }}",
                     },
                     success: function(response) {
                         if (response.success) {
-// Update the UI dynamically
                             $("#status-" + passengerId).html("✅ Checked In");
                         } else {
                             alert("Failed to check in passenger.");
@@ -88,12 +83,10 @@
                     {% for passenger in non_passengers %}
                         <option value="{{ passenger.id }}">{{ passenger }}</option>
                     {% endfor %}
-
                 </select>
                 <button type="submit" class="add-passenger-btn">Add Passenger</button>
             </form>
         {% endif %}
-
 
 <!--Return back to Flight list(index.html)-->
         <a href="{% url 'index' %}" class="back-btn" style="text-decoration: none">Back to Flight List</a>

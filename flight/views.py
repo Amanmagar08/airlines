@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.urls import reverse
 
-from .models import Flight, Passenger
+from .models import Flight, Passenger, FlightPassenger
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -17,12 +17,17 @@ def index(request):
 
 def flight(request, flight_id):
     flight = get_object_or_404(Flight, pk=flight_id)
-
+    passengers = flight.passengers.all()
+    passenger_status = {
+        passenger.id: flight.flightpassenger_set.get(passenger=passenger).checked_in for passenger in passengers
+    }
     return render(request, "flights/flight.html", {
         "flight": flight,
-        "passengers": flight.passengers.all(),
-        "non_passengers": Passenger.objects.exclude(flights=flight).all()  # Corrected query
+        "passengers": passengers,
+        "passenger_status": passenger_status,
+        "non_passengers": Passenger.objects.exclude(flights=flight).all()
     })
+
 
 
 def book(request, flight_id):
@@ -43,14 +48,14 @@ def remove(request, flight_id):
 
         return HttpResponseRedirect(reverse("flight", args=(flight.id,)))
 
-@csrf_exempt  # Only use this if you're not using CSRF protection in your AJAX request
-def check_in(request, passenger_id):
+@csrf_exempt
+def check_in(request, passenger_id, flight_id):
     if request.method == "POST":
         try:
-            passenger = Passenger.objects.get(id=passenger_id)
-            passenger.checked_in = True
-            passenger.save()
+            flight_passenger = FlightPassenger.objects.get(passenger_id=passenger_id, flight_id=flight_id)
+            flight_passenger.checked_in = True
+            flight_passenger.save()
             return JsonResponse({"success": True})
-        except Passenger.DoesNotExist:
-            return JsonResponse({"success": False, "error": "Passenger not found."})
+        except FlightPassenger.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Passenger not found on this flight."})
     return JsonResponse({"success": False, "error": "Invalid request method."})
