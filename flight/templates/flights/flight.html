@@ -19,13 +19,15 @@
                 {% for passenger in passengers %}
                     <div class="passenger-item">
                         <span>{{ passenger }}</span>
-                        {% if flight.status == "Null" %}
-                           <form action="{% url 'remove' flight.id %}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to remove this passenger?');">
-                            {% csrf_token %}
-                            <input type="hidden" name="passenger" value="{{ passenger.id }}">
-                            <button type="submit">Remove</button>
-                            </form>
+                        {% if request.user.is_staff %}
+                            {% if flight.status == "Null" %}
+                                <form action="{% url 'remove' flight.id %}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to remove this passenger?');">
+                                {% csrf_token %}
+                                <input type="hidden" name="passenger" value="{{ passenger.id }}">
+                                <button type="submit">Remove</button>
+                            {% endif %}
                         {% endif %}
+                            </form>
                     </div>
                 {% empty %}
                     <p>No passengers on this flight.</p>
@@ -34,6 +36,7 @@
         </div>
 
 <!--Check in For the Passengers-->
+    {% if request.user.is_staff %}
         <div class="list">
             <h3>Passenger Check-in</h3>
             <div class="passenger-items-container">
@@ -57,6 +60,7 @@
                 {% endfor %}
             </div>
         </div>
+    {% endif %}
 
 <!--jQuery JavaScript library -->
 <!--For Passenger Check in-->
@@ -84,17 +88,19 @@
         </script>
 
 <!--Add Passenger to the Flight-->
-        {% if flight.status == "Null" %}
-            {% if non_passengers %}
-                <form action="{% url 'book' flight.id %}" method="POST">
-                    {% csrf_token %}
-                    <select name="passenger">
-                        {% for passenger in non_passengers %}
-                            <option value="{{ passenger.id }}">{{ passenger }}</option>
-                        {% endfor %}
-                    </select>
-                    <button type="submit" class="add-passenger-btn">Add Passenger</button>
-                </form>
+        {% if request.user.is_staff %}
+            {% if flight.status == "Null" %}
+                {% if non_passengers %}
+                    <form action="{% url 'book' flight.id %}" method="POST">
+                        {% csrf_token %}
+                        <select name="passenger">
+                            {% for passenger in non_passengers %}
+                                <option value="{{ passenger.id }}">{{ passenger }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="add-passenger-btn">Add Passenger</button>
+                    </form>
+                {% endif %}
             {% endif %}
         {% endif %}
 
@@ -104,18 +110,20 @@
             <p>Flight from {{ flight.origin }} to {{ flight.destination }}</p>
             <p>Status: <strong>{{ flight.get_status_display }}</strong></p>
 
-            <form method="post" action="{% url 'update_flight_status' flight.id %}">
-                {% csrf_token %}
-                {% if flight.status == "Null" %}
-                    <button type="submit" class="status">Ready to Board</button>
-                {% elif flight.status == "Ready" %}
-                    <button type="submit" class="status">Start Boarding</button>
-                {% elif flight.status == "Boarding" %}
-                    <button type="submit" class="status">Mark as Landed</button>
-                {% else %}
-                    <button disabled class="status" style="background-color: #798269">Flight Completed</button>
-                {% endif %}
-            </form>
+            {% if request.user.is_staff %}
+                <form method="post" action="{% url 'update_flight_status' flight.id %}">
+                    {% csrf_token %}
+                    {% if flight.status == "Null" %}
+                        <button type="submit" class="status">Ready to Board</button>
+                    {% elif flight.status == "Ready" %}
+                        <button type="submit" class="status">Start Boarding</button>
+                    {% elif flight.status == "Boarding" %}
+                        <button type="submit" class="status">Mark as Landed</button>
+                    {% else %}
+                        <button disabled class="status" style="background-color: #798269">Flight Completed</button>
+                    {% endif %}
+                </form>
+            {% endif %}
         </div>
     {% endif %}
 

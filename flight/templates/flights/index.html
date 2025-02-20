@@ -40,14 +40,16 @@
                 </tbody>
             </table>
         </div>
-        <div>
-            <form method="post" action="{% url 'create_passenger' %}">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="create-passenger-btn">Create Passenger</button>
-            </form>
+        {% if request.user.is_staff %}
+            <div>
+                <form method="post" action="{% url 'create_passenger' %}">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="create-passenger-btn">Create Passenger</button>
+                </form>
 
-        </div>
+            </div>
+        {% endif %}
     </div>
 
 {% endblock %}
