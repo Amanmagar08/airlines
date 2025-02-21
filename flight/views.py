@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect,HttpResponseBadRequest
 from django.urls import reverse
 from .forms import PassengerForm
 from .models import Flight, Passenger, FlightPassenger
@@ -17,35 +17,75 @@ def index(request):
 def flight(request, flight_id):
     flight = get_object_or_404(Flight, pk=flight_id)
     passengers = flight.passengers.all()
+
+    # Store the checked-in status for each passenger
     passenger_status = {
         passenger.id: flight.flightpassenger_set.get(passenger=passenger).checked_in for passenger in passengers
     }
+
+    # Create a list of passenger full names
+    booked_passenger_names = [f"{p.first} {p.last}" for p in passengers]
+
     return render(request, "flights/flight.html", {
         "flight": flight,
         "passengers": passengers,
         "passenger_status": passenger_status,
-        "non_passengers": Passenger.objects.exclude(flights=flight).all()
+        "non_passengers": Passenger.objects.exclude(flights=flight).all(),
+        "booked_passenger_names": booked_passenger_names,  # ✅ Pass formatted names
     })
+
+
 
 
 
 def book(request, flight_id):
     if request.method == "POST":
-            flight = Flight.objects.get(pk = flight_id)
-            passenger = Passenger.objects.get(pk = int(request.POST["passenger"]))
-            passenger.flights.add(flight)
-            return HttpResponseRedirect(reverse("flight", args=(flight.id,)))
+        flight = get_object_or_404(Flight, pk=flight_id)
+
+        if request.user.is_staff:
+            # Staff selects a passenger from dropdown
+            passenger_id = request.POST.get("passenger")
+            if not passenger_id:
+                return HttpResponseBadRequest("No passenger selected.")
+            passenger = get_object_or_404(Passenger, pk=int(passenger_id))
+        else:
+            # Find passenger by first and last name matching the logged-in user
+            passenger = get_object_or_404(Passenger, first=request.user.first_name, last=request.user.last_name)
+
+        # Add the passenger to the flight
+        passenger.flights.add(flight)
+
+        return HttpResponseRedirect(reverse("flight", args=(flight.id,)))
+
+    return HttpResponseBadRequest("Invalid request")
+
+
 
 def remove(request, flight_id):
     if request.method == "POST":
-        flight = Flight.objects.get(pk=flight_id)
-        passenger = Passenger.objects.get(pk=int(request.POST["passenger"]))
+        flight = get_object_or_404(Flight, pk=flight_id)
+
+        if request.user.is_staff:
+            # Staff removes a selected passenger
+            passenger_id = request.POST.get("passenger")
+            if not passenger_id:
+                return HttpResponseBadRequest("No passenger selected.")
+            passenger = get_object_or_404(Passenger, pk=int(passenger_id))
+        else:
+            # Normal user removes themselves
+            passenger = get_object_or_404(Passenger, first=request.user.first_name, last=request.user.last_name)
+
+        # Remove the passenger from the flight
         passenger.flights.remove(flight)
 
-        passenger.checked_in = False
-        passenger.save()
+        # If your model has a checked-in field, reset it
+        if hasattr(passenger, "checked_in"):
+            passenger.checked_in = False
+            passenger.save()
 
         return HttpResponseRedirect(reverse("flight", args=(flight.id,)))
+
+    return HttpResponseBadRequest("Invalid request")
 
 @csrf_exempt
 def check_in(request, passenger_id, flight_id):

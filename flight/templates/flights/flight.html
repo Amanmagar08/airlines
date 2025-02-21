@@ -102,6 +102,20 @@
                     </form>
                 {% endif %}
             {% endif %}
+        {% else %}
+            {% with user_full_name=request.user.first_name|add:" "|add:request.user.last_name %}
+                {% if user_full_name in booked_passenger_names %}
+                    <form action="{% url 'remove' flight.id %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="add-passenger-btn" style="background-color: #a71d2a">Cancel Flight</button>
+                    </form>
+                {% else %}
+                    <form action="{% url 'book' flight.id %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="add-passenger-btn">Book Flight</button>
+                    </form>
+                {% endif %}
+            {% endwith %}
         {% endif %}
 
     {% if flight.status != "Landed" %}

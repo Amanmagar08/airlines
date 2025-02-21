@@ -24,12 +24,12 @@
 
                             <!-- Link to Flight Details page -->
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'index' %}">Flights</a>  <!-- 'index' points to the 'flight/' page -->
+                                <a class="nav-link" href="{% url 'index' %}">Flights</a>
                             </li>
 
                             <!-- Link to Create New Passenger page for staff member-->
                             {% if request.user.is_staff %}
-                                <li class="nav-item">
+                                <li class="nav-item" >
                                     <a class="nav-link" href="{% url 'create_passenger' %}">Create Passenger</a>
                                 </li>
                             {% endif %}
